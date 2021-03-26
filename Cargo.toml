@@ -1,17 +1,21 @@
 [package]
 name = "webrtc-rs-sdp"
 version = "0.1.0"
-authors = ["Rain Liu <yuliu@webrtc.rs>"]
 edition = "2018"
-description = "A pure Rust implementation of SDP"
+resolver = "2"
+authors = ["Rain Liu <yuliu@webrtc.rs>"]
+description = "Pure Rust implementation of SDP for WebRTC"
 license = "MIT"
 documentation = "https://docs.rs/webrtc-rs-sdp"
 homepage = "https://webrtc.rs"
 repository = "https://github.com/webrtc-rs/sdp"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+keywords = ["jsep", "sdp", "webrtc"]
+categories = ["network-programming", "parsing"]
 
 [dependencies]
-url = "2.1.0"
-rand = "0.8.0"
+derive_more = { version = "0.99.13", features = ["as_ref", "display", "error", "from", "into"] , default-features = false }
+smartstring = "0.2.6"
+
+url = "2.1"
+rand = "0.8"
 thiserror = "1.0.23"

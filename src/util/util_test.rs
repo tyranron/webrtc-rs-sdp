@@ -31,9 +31,9 @@ fn get_test_session_description() -> SessionDescription {
                 ],
                 ..Default::default()
             },
-		],
+        ],
         ..Default::default()
-	};
+    };
 }
 
 #[test]
