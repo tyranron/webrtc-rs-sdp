@@ -2,10 +2,10 @@
 //!
 //! [SDP origin]: https://tools.ietf.org/html/rfc4566#section-5.2
 
-use derive_more::{AsRef, Display, Error, From, Into};
+use derive_more::{AsRef, Display, Error, Into};
 use smartstring::alias::String;
 
-use super::address;
+use super::{connection, session};
 
 /// Representation of an [SDP origin].
 ///
@@ -25,14 +25,14 @@ pub struct Origin {
 
     /// Numeric string such that the tuple of `<username>`, `<sess-id>`, `<nettype>`, `<addrtype>`,
     /// and `<unicast-address>` forms a globally unique identifier for the session.
-    pub sess_id: SessionId,
+    pub sess_id: session::Id,
 
     /// Version number for this session description.
-    pub sess_version: SessionVersion,
+    pub sess_version: session::Version,
 
     /// Address of the machine from which the session was created, along with `<addrtype>` and
     /// `<nettype>`.
-    pub unicast_address: address::Full,
+    pub unicast_address: connection::Data,
 }
 
 /// Representation of [SDP origin]'s `username`.
@@ -40,8 +40,9 @@ pub struct Origin {
 /// `-` (hyphen) doesn't count as a valid [`Username`], but rather as its absence.
 ///
 /// [SDP origin]: https://tools.ietf.org/html/rfc4566#section-5.2
-#[derive(AsRef, Clone, Debug, Display)]
+#[derive(AsRef, Clone, Debug, Deref, Display, Eq, Into, PartialEq)]
 #[as_ref(forward)]
+#[deref(forward)]
 pub struct Username(String);
 
 impl Username {
@@ -53,9 +54,9 @@ impl Username {
     /// See [`InvalidUsernameError`] for details.
     fn try_new<S: AsRef<str> + Into<String>>(value: S) -> Result<Self, InvalidUsernameError> {
         match value.as_ref() {
-            "" => Err(InvalidUsernameError::IsEmpty),
-            "-" => Err(InvalidUsernameError::IsHyphen),
-            v if v.contains(' ') => Err(InvalidUsernameError::HasSpaces),
+            "" => Err(InvalidUsernameError::Empty),
+            "-" => Err(InvalidUsernameError::Hyphen),
+            v if v.contains(' ') => Err(InvalidUsernameError::WithSpaces),
             _ => Ok(Self(value.into())),
         }
     }
@@ -66,30 +67,14 @@ impl Username {
 pub enum InvalidUsernameError {
     /// [`Username`] contains spaces, while must not.
     #[display(fmt = "cannot contain spaces")]
-    HasSpaces,
+    WithSpaces,
 
-    /// [`Username`] is a empty string.
+    /// [`Username`] is an empty string.
     #[display(fmt = "cannot be empty")]
-    IsEmpty,
+    Empty,
 
     /// [`Username`] is a hyphen, while hyphen should describe an absence of a [`Username`].
     /// Use [`None`] for hyphens.
     #[display(fmt = "cannot be `-` (hyphen), use `None` instead")]
-    IsHyphen,
+    Hyphen,
 }
-
-/// Representation of [SDP origin]'s `sess-id`.
-///
-/// See [`Origin::sess_id`] docs for details.
-///
-/// [SDP origin]: https://tools.ietf.org/html/rfc4566#section-5.2
-#[derive(Clone, Copy, Debug, Display, Eq, From, Into, PartialEq)]
-pub struct SessionId(u64);
-
-/// Representation of [SDP origin]'s `sess-version`.
-///
-/// See [`Origin::sess_version`] docs for details.
-///
-/// [SDP origin]: https://tools.ietf.org/html/rfc4566#section-5.2
-#[derive(Clone, Copy, Debug, Display, Eq, From, Into, Ord, PartialEq, PartialOrd)]
-pub struct SessionVersion(u64);
