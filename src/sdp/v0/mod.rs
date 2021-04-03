@@ -6,5 +6,6 @@ pub mod connection;
 pub mod origin;
 pub mod session;
 pub mod timing;
+pub mod encryption;
 
 pub use self::origin::Origin;

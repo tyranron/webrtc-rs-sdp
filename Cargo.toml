@@ -16,10 +16,12 @@ categories = ["network-programming", "parsing"]
 derive_more = { version = "0.99.13", features = ["as_mut", "as_ref", "deref", "deref_mut", "display", "error", "from", "from_str", "into"], default-features = false }
 once_cell = { version = "1.7", features = ["parking_lot", "std"], default-features = false }
 regex = { version = "1.4", features = ["perf", "std"], default-features = false }
+secrecy = { version = "0.7", features = ["alloc"], default-features = false }
 smallvec = "1.6"
 smart-default = "0.6"
 smartstring = "0.2.6"
 url = "2.1"
+
 
 rand = "0.8"
 thiserror = "1.0.23"

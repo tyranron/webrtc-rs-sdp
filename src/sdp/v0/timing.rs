@@ -126,7 +126,7 @@ pub struct RepeatTime {
     active_duration: Duration,
 
     /// Offsets from [`Timing::start_time`] of a session.
-    offsets: SmallVec<[Duration; 2]>,
+    offsets: SmallVec<[Offset; 2]>,
 }
 
 // Manual implementation here allows to omit redundant allocation
@@ -169,4 +169,43 @@ impl From<Duration> for StdDuration {
     fn from(d: Duration) -> Self {
         d.to_std()
     }
+}
+
+/// Representation of a [`RepeatTime`]/[`TimeZone`] offset in seconds as defined in
+/// [Section 5.10] and [Section 5.11] of [RFC 4566].
+///
+/// [RFC 4566]: https://tools.ietf.org/html/rfc4566
+/// [Section 5.10]: https://tools.ietf.org/html/rfc4566#section-5.10
+/// [Section 5.11]: https://tools.ietf.org/html/rfc4566#section-5.11
+#[derive(Clone, Copy, Debug, Default, Display, Eq, From, Into, PartialEq)]
+pub struct Offset(i64);
+
+impl Offset {
+    /// Indicates whether this [`Offset`] equals to its default zero value.
+    #[inline]
+    #[must_use]
+    pub fn is_zero(self) -> bool {
+        self.0 == 0
+    }
+}
+
+/// Representation of a time zone adjustment for a repeated sessions scheduling as defined in
+/// [Section 5.11 of RFC 4566][1].
+///
+/// [1]: https://tools.ietf.org/html/rfc4566#section-5.11
+#[derive(Clone, Copy, Debug, Display)]
+#[display(fmt = "{} {}", adjustment_time, offset)]
+pub struct TimeZone {
+    /// Adjustment time base by which the session's repeat times are calculated considering the
+    /// [`TimeZone::offset`].
+    ///
+    /// From [Section 5.11 of RFC 4566][1]:
+    /// > Adjustments are always relative to the specified start time -- they are not cumulative.
+    /// > Adjustments apply to all "t=" and "r=" lines in a session description.
+    ///
+    /// [1]: https://tools.ietf.org/html/rfc4566#section-5.11
+    pub adjustment_time: Time,
+
+    /// Offset to be applied after the [`TimeZone::adjustment_time`] base.
+    pub offset: Offset,
 }
